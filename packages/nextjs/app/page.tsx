@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import { formatEther, maxUint256 } from "viem";
+import { formatEther, parseEther } from "viem";
 import { erc20Abi } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 import { useWriteContract } from "wagmi";
 import { useDeployedContractInfo, useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 const CLAWD_TOKEN = "0x9f86dB9fc6f7c9408e8Fda3Ff8ce4e78ac7a6b07" as `0x${string}`;
+const STAKE_AMOUNT = parseEther("50000");
 
 // Admin is read from the contract — no hardcoded address needed
 
@@ -93,7 +94,7 @@ function SubmissionCard({ id, rank, isTimedOut }: { id: number; rank: number; is
         address: CLAWD_TOKEN,
         abi: erc20Abi,
         functionName: "approve",
-        args: [deployedContract.address, maxUint256],
+        args: [deployedContract.address, STAKE_AMOUNT],
       });
       await publicClient.waitForTransactionReceipt({ hash: approveTx });
       // Then stake
@@ -181,7 +182,7 @@ function SubmitForm() {
         address: CLAWD_TOKEN,
         abi: erc20Abi,
         functionName: "approve",
-        args: [deployedContract.address, maxUint256],
+        args: [deployedContract.address, STAKE_AMOUNT],
       });
       // Wait for approval to be mined
       await publicClient.waitForTransactionReceipt({ hash: approveTx });
