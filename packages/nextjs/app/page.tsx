@@ -462,10 +462,18 @@ const Home: NextPage = () => {
   const { data: winnerSubmission } = useScaffoldReadContract({
     contractName: "ClawdPFPMarket",
     functionName: "getSubmission",
-    args: [winningId ?? 0n],
+    args: [winnerPicked ? (winningId ?? 0n) : 0n],
   });
 
-  const isTimedOut = deadline ? Math.floor(Date.now() / 1000) >= Number(deadline) : false;
+  const { data: timeRemaining } = useScaffoldReadContract({
+    contractName: "ClawdPFPMarket",
+    functionName: "timeRemaining",
+  });
+
+  // Use chain-reported timeRemaining (accurate on forks) with browser-time fallback
+  const isTimedOut = timeRemaining !== undefined
+    ? timeRemaining === 0n
+    : deadline ? Math.floor(Date.now() / 1000) >= Number(deadline) : false;
 
   return (
     <div className="flex flex-col items-center min-h-screen">
@@ -552,6 +560,18 @@ const Home: NextPage = () => {
               <li>Submit something offensive = banned + your stake gets burned 🔥</li>
             </ul>
             <p className="mt-2 font-bold">Theme: Lobster AI agent with a wallet and dapp building tools 🦞🤖</p>
+            <div className="divider my-1"></div>
+            <p className="text-xs opacity-50">
+              $CLAWD:{" "}
+              <a
+                href={`https://basescan.org/token/${CLAWD_TOKEN}`}
+                target="_blank"
+                rel="noreferrer"
+                className="link"
+              >
+                {CLAWD_TOKEN}
+              </a>
+            </p>
           </div>
         </div>
       </div>

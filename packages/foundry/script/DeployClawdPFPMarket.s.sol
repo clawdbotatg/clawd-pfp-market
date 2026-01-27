@@ -9,12 +9,16 @@ contract DeployClawdPFPMarket is ScaffoldETHDeploy {
         // $CLAWD token on Base
         address clawdToken = 0x9f86dB9fc6f7c9408e8Fda3Ff8ce4e78ac7a6b07;
 
-        // Duration: 10 minutes for testing, 5 hours for production
-        uint256 duration = 10 minutes;
+        // Duration: configurable via env, default 10 minutes for testing
+        uint256 duration = vm.envOr("ROUND_DURATION", uint256(10 minutes));
 
-        // Admin: deployer wallet (burner in dev, MetaMask in prod)
-        address admin = deployer;
+        // Admin: configurable via env, default to deployer for testing
+        address admin = vm.envOr("ADMIN_ADDRESS", deployer);
 
-        new ClawdPFPMarket(clawdToken, duration, admin);
+        ClawdPFPMarket market = new ClawdPFPMarket(clawdToken, duration, admin);
+        console.log("ClawdPFPMarket deployed at:", address(market));
+        console.log("  Admin:", admin);
+        console.log("  Duration:", duration, "seconds");
+        console.log("  CLAWD token:", clawdToken);
     }
 }
