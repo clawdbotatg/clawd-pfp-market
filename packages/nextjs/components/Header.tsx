@@ -3,10 +3,15 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { formatEther } from "viem";
+import { erc20Abi } from "viem";
 import { hardhat } from "viem/chains";
+import { useAccount, useReadContract } from "wagmi";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
+
+const CLAWD_TOKEN = "0x9f86dB9fc6f7c9408e8Fda3Ff8ce4e78ac7a6b07" as `0x${string}`;
 
 type HeaderMenuLink = {
   label: string;
@@ -39,6 +44,28 @@ export const HeaderMenuLinks = () => {
         );
       })}
     </>
+  );
+};
+
+const ClawdBalance = () => {
+  const { address } = useAccount();
+  const { data: balance } = useReadContract({
+    address: CLAWD_TOKEN,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address, refetchInterval: 3000 },
+  });
+
+  if (!address || balance === undefined) return null;
+
+  const formatted = Number(formatEther(balance)).toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+  return (
+    <div className="text-right">
+      <span className="text-xl font-bold">{formatted}</span>
+      <span className="text-sm opacity-60 ml-1">$CLAWD</span>
+    </div>
   );
 };
 
@@ -77,7 +104,8 @@ export const Header = () => {
           <HeaderMenuLinks />
         </ul>
       </div>
-      <div className="navbar-end grow mr-4">
+      <div className="navbar-end grow mr-4 gap-3">
+        <ClawdBalance />
         <RainbowKitCustomConnectButton />
         {isLocalNetwork && <FaucetButton />}
       </div>

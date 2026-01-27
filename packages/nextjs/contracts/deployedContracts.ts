@@ -697,7 +697,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 41380462,
+      deployedOnBlock: 41381036,
     },
   },
 } as const;
