@@ -1,0 +1,195 @@
+{
+  "_comment": "Whale addresses for funding test wallets on Anvil forks. Protocol contracts are more reliable than EOAs.",
+  "base": {
+    "chainId": 8453,
+    "whales": {
+      "USDC": {
+        "address": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
+        "label": "Morpho Blue",
+        "protocol": "Morpho",
+        "balance": "~131M",
+        "isContract": true,
+        "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      },
+      "USDC_ALT": {
+        "address": "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB",
+        "label": "Aave aBasUSDC Token",
+        "protocol": "Aave",
+        "balance": "~97M",
+        "isContract": true,
+        "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      },
+      "WETH": {
+        "address": "0x4200000000000000000000000000000000000006",
+        "label": "WETH Contract (mint directly via deposit)",
+        "protocol": "Native",
+        "balance": "Unlimited",
+        "isContract": true,
+        "tokenAddress": "0x4200000000000000000000000000000000000006",
+        "note": "For WETH, easier to just call deposit() with ETH from funded address"
+      },
+      "USDbC": {
+        "address": "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB",
+        "label": "Aave aBasUSDbC Token",
+        "protocol": "Aave",
+        "balance": "~50M",
+        "isContract": true,
+        "tokenAddress": "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA"
+      }
+    }
+  },
+  "mainnet": {
+    "chainId": 1,
+    "whales": {
+      "USDC": {
+        "address": "0x4B16c5dE96EB2117bBE5fd171E4d203624B014aa",
+        "label": "Circle Reserve",
+        "protocol": "Circle",
+        "balance": "~2B",
+        "isContract": true,
+        "tokenAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      },
+      "USDT": {
+        "address": "0x5754284f345afc66a98fbB0a0Afe71e0F007B949",
+        "label": "Tether Treasury",
+        "protocol": "Tether",
+        "balance": "~1B",
+        "isContract": false,
+        "tokenAddress": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      },
+      "DAI": {
+        "address": "0x40ec5B33f54e0E8A33A975908C5BA1c14e5BbbDf",
+        "label": "Polygon Bridge",
+        "protocol": "Polygon",
+        "balance": "~100M",
+        "isContract": true,
+        "tokenAddress": "0x6B175474E89094C44Da98b954EesdeB6ef1D7C"
+      },
+      "WETH": {
+        "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "label": "WETH Contract",
+        "protocol": "Native",
+        "balance": "Unlimited",
+        "isContract": true,
+        "tokenAddress": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "note": "For WETH, call deposit() with ETH"
+      },
+      "stETH": {
+        "address": "0x93c4b944D05dfe6df7645A86cd2206016c51564D",
+        "label": "EigenLayer stETH Strategy",
+        "protocol": "EigenLayer",
+        "balance": "~1M ETH",
+        "isContract": true,
+        "tokenAddress": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+      }
+    }
+  },
+  "arbitrum": {
+    "chainId": 42161,
+    "whales": {
+      "USDC": {
+        "address": "0x489ee077994B6658eAfA855C308275EAd8097C4A",
+        "label": "GMX Vault",
+        "protocol": "GMX",
+        "balance": "~50M",
+        "isContract": true,
+        "tokenAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+      },
+      "WETH": {
+        "address": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+        "label": "WETH Contract",
+        "protocol": "Native",
+        "balance": "Unlimited",
+        "isContract": true,
+        "tokenAddress": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+      },
+      "ARB": {
+        "address": "0xF3FC178157fb3c87548bAA86F9d24BA38E649B58",
+        "label": "Arbitrum DAO Treasury",
+        "protocol": "Arbitrum",
+        "balance": "~3B",
+        "isContract": true,
+        "tokenAddress": "0x912CE59144191C1204E64559FE8253a0e49E6548"
+      }
+    }
+  },
+  "optimism": {
+    "chainId": 10,
+    "whales": {
+      "USDC": {
+        "address": "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+        "label": "Aave V3 Pool",
+        "protocol": "Aave",
+        "balance": "~20M",
+        "isContract": true,
+        "tokenAddress": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
+      },
+      "WETH": {
+        "address": "0x4200000000000000000000000000000000000006",
+        "label": "WETH Contract",
+        "protocol": "Native",
+        "balance": "Unlimited",
+        "isContract": true,
+        "tokenAddress": "0x4200000000000000000000000000000000000006"
+      },
+      "OP": {
+        "address": "0x2A82Ae142b2e62Cb7D10b55E323ACB1Cab663a26",
+        "label": "Optimism Foundation",
+        "protocol": "Optimism",
+        "balance": "~500M",
+        "isContract": true,
+        "tokenAddress": "0x4200000000000000000000000000000000000042"
+      }
+    }
+  },
+  "polygon": {
+    "chainId": 137,
+    "whales": {
+      "USDC": {
+        "address": "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+        "label": "Aave V3 Pool",
+        "protocol": "Aave",
+        "balance": "~50M",
+        "isContract": true,
+        "tokenAddress": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+      },
+      "WMATIC": {
+        "address": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+        "label": "WMATIC Contract",
+        "protocol": "Native",
+        "balance": "Unlimited",
+        "isContract": true,
+        "tokenAddress": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"
+      }
+    }
+  },
+  "fundingInstructions": {
+    "steps": [
+      "1. First, give the whale contract some ETH for gas (if needed):",
+      "   cast rpc anvil_setBalance <WHALE_ADDRESS> 0x56BC75E2D63100000",
+      "",
+      "2. Impersonate the whale account:",
+      "   cast rpc anvil_impersonateAccount <WHALE_ADDRESS>",
+      "",
+      "3. Transfer tokens from whale to your address:",
+      "   cast send <TOKEN_ADDRESS> \"transfer(address,uint256)\" <YOUR_ADDRESS> <AMOUNT> --from <WHALE_ADDRESS> --unlocked",
+      "",
+      "4. Stop impersonation (optional):",
+      "   cast rpc anvil_stopImpersonatingAccount <WHALE_ADDRESS>"
+    ],
+    "exampleBase": {
+      "description": "Fund 10,000 USDC on Base fork",
+      "commands": [
+        "# Give whale ETH for gas",
+        "cast rpc anvil_setBalance 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb 0x56BC75E2D63100000",
+        "",
+        "# Impersonate Morpho Blue (USDC whale)",
+        "cast rpc anvil_impersonateAccount 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
+        "",
+        "# Transfer 10,000 USDC (6 decimals = 10000000000)",
+        "cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \"transfer(address,uint256)\" YOUR_ADDRESS 10000000000 --from 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb --unlocked"
+      ]
+    },
+    "wethNote": "For WETH, it's easier to fund ETH then call deposit(): cast send <WETH_ADDRESS> \"deposit()\" --value 10ether"
+  }
+}

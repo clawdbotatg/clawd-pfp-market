@@ -1,0 +1,90 @@
+{
+  "name": "ethereum-wingman",
+  "version": "1.0.0",
+  "description": "A comprehensive Ethereum development tutor and guide covering SpeedRun Ethereum challenges, Scaffold-ETH tooling, DeFi protocols, and security best practices.",
+  "author": "BuidlGuidl",
+  "license": "MIT",
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "web3",
+    "defi",
+    "smart-contracts",
+    "scaffold-eth",
+    "speedrun-ethereum",
+    "security",
+    "tutorial"
+  ],
+  "capabilities": [
+    "ethereum-fundamentals",
+    "solidity-development",
+    "defi-protocols",
+    "security-auditing",
+    "scaffold-eth-tooling",
+    "code-review"
+  ],
+  "knowledge_base": {
+    "challenges": {
+      "path": "knowledge/challenges/",
+      "description": "SpeedRun Ethereum challenge TLDR modules covering tokenization, staking, DEXs, lending, oracles, and more"
+    },
+    "protocols": {
+      "path": "knowledge/protocols/",
+      "description": "DeFi protocol documentation for Uniswap, Aave, Compound"
+    },
+    "standards": {
+      "path": "knowledge/standards/",
+      "description": "ERC standards reference (ERC-20, ERC-721, ERC-1155, ERC-4626)"
+    },
+    "foundations": {
+      "path": "knowledge/foundations/",
+      "description": "Ethereum basics, Solidity essentials, Layer 2 ecosystem guide, automation & incentives (CRITICAL), oracles, composability, governance, Hardhat vs Foundry"
+    },
+    "gotchas": {
+      "path": "knowledge/gotchas/",
+      "description": "Critical development gotchas and historical hack case studies"
+    }
+  },
+  "tools": {
+    "scaffold-eth": {
+      "path": "tools/scaffold-eth/",
+      "description": "Scaffold-ETH 2 workflows, forking, and hooks reference"
+    },
+    "deployment": {
+      "path": "tools/deployment/",
+      "description": "MCP reference and full-stack dApp patterns"
+    },
+    "security": {
+      "path": "tools/security/",
+      "description": "Pre-production security checklist"
+    }
+  },
+  "prompts": {
+    "tutor": {
+      "path": "prompts/tutor.md",
+      "description": "Teaching mode for explaining concepts"
+    },
+    "review": {
+      "path": "prompts/review.md",
+      "description": "Code review mode for security analysis"
+    },
+    "debug": {
+      "path": "prompts/debug.md",
+      "description": "Debugging assistant for troubleshooting"
+    },
+    "build": {
+      "path": "prompts/build.md",
+      "description": "Project building mode with Scaffold-ETH"
+    }
+  },
+  "integrations": {
+    "cursor": {
+      "rules_path": ".cursorrules",
+      "description": "Cursor IDE rules file"
+    },
+    "claude_code": {
+      "instructions_path": "CLAUDE.md",
+      "description": "Claude Code project instructions"
+    }
+  }
+}
