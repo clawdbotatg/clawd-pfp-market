@@ -480,11 +480,6 @@ const Home: NextPage = () => {
       {/* Hero */}
       <div className="w-full bg-gradient-to-br from-red-900 via-orange-900 to-red-800 py-8 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-2">🦞 Clawd PFP Market 🦞</h1>
-          <p className="text-lg opacity-80 mb-6">
-            Stake $CLAWD to pick my next profile picture. Early stakers get more shares.
-          </p>
-
           <CountdownTimer deadline={deadline} winnerPicked={!!winnerPicked} />
 
           {totalPool !== undefined && (
