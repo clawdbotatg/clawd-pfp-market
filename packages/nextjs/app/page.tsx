@@ -275,7 +275,7 @@ function SubmissionCard({
                 </div>
                 {userShares !== undefined && userShares > 0n && (
                   <div className="text-sm font-semibold text-accent">
-                    🎟️ Your shares: {Number(userShares).toLocaleString()}
+                    🎟️ Your shares: {Number(formatEther(userShares)).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                   </div>
                 )}
                 <div className="text-xs opacity-40 truncate">
