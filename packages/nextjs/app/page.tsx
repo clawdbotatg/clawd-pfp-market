@@ -195,11 +195,10 @@ function SubmissionCard({
   const userShares = userSharesData?.[0]?.result as bigint | undefined;
 
   const [isSwitching, setIsSwitching] = useState(false);
-  const [isApproving, setIsApproving] = useState(false);
   const [isStaking, setIsStaking] = useState(false);
 
   const { writeContractAsync: writeMarket } = useScaffoldWriteContract("ClawdPFPMarket");
-  const { writeContractAsync: writeErc20 } = useWriteContract();
+  const { writeContractAsync: writeErc20, isPending: isApproving } = useWriteContract();
 
   if (!submission) return null;
 
@@ -220,7 +219,6 @@ function SubmissionCard({
 
   const handleApprove = async () => {
     if (!contractAddress) return;
-    setIsApproving(true);
     try {
       await writeErc20({
         address: CLAWD_TOKEN,
@@ -231,8 +229,6 @@ function SubmissionCard({
       setTimeout(onRefetch, 2000);
     } catch (e) {
       console.error("Approve failed:", e);
-    } finally {
-      setIsApproving(false);
     }
   };
 
@@ -356,14 +352,13 @@ function SubmitForm({
 }) {
   const [imageUrl, setImageUrl] = useState("");
   const [isSwitching, setIsSwitching] = useState(false);
-  const [isApproving, setIsApproving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { isConnected } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
   const isOnBase = chainId === base.id;
   const { writeContractAsync: writeMarket } = useScaffoldWriteContract("ClawdPFPMarket");
-  const { writeContractAsync: writeErc20 } = useWriteContract();
+  const { writeContractAsync: writeErc20, isPending: isApproving } = useWriteContract();
 
   const hasEnoughAllowance = allowance >= STAKE_AMOUNT;
 
@@ -380,7 +375,6 @@ function SubmitForm({
 
   const handleApprove = async () => {
     if (!contractAddress) return;
-    setIsApproving(true);
     try {
       await writeErc20({
         address: CLAWD_TOKEN,
@@ -391,8 +385,6 @@ function SubmitForm({
       setTimeout(onRefetch, 2000);
     } catch (e) {
       console.error("Approve failed:", e);
-    } finally {
-      setIsApproving(false);
     }
   };
 
