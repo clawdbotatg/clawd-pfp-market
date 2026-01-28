@@ -11,6 +11,12 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  *         Users submit image URLs + stake $CLAWD. Others can stake on
  *         submissions they like. Admin picks the winner after the deadline.
  *         Bonding curve per image — early stakers get more shares.
+ *
+ * Audit fixes applied:
+ * - Bonding curve normalized (shares in whole units for price calc)
+ * - Claim pattern for payouts (no unbounded loop DoS)
+ * - Emergency rescue after 30 days if admin MIA
+ * - Dust goes to last claimer
  */
 contract ClawdPFPMarket is ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -42,6 +48,8 @@ contract ClawdPFPMarket is ReentrancyGuard {
     uint256 public constant OP_BONUS_BPS = 1000; // 10%
     // Staker pool = 65% (remainder)
 
+    uint256 public constant RESCUE_DELAY = 30 days;
+
     // ══════════════════════════════════════════════════════════════
     //                          STATE
     // ══════════════════════════════════════════════════════════════
@@ -61,6 +69,15 @@ contract ClawdPFPMarket is ReentrancyGuard {
 
     uint256 public totalPool;  // Total CLAWD in the pool (across all images, minus slashed)
 
+    // Claim pattern state
+    uint256 public stakerPool;           // 65% of pool, set when winner picked
+    uint256 public stakerPoolRemaining;  // Tracks remaining for dust handling
+    uint256 public totalWinningShares;   // Cached for claims
+    uint256 public claimedCount;         // How many stakers have claimed
+    uint256 public totalWinningStakers;  // Total stakers on winning submission
+    mapping(address => bool) public hasClaimed;
+    bool public rescueTriggered;
+
     // ══════════════════════════════════════════════════════════════
     //                          EVENTS
     // ══════════════════════════════════════════════════════════════
@@ -71,6 +88,8 @@ contract ClawdPFPMarket is ReentrancyGuard {
     event Banned(uint256 indexed id, uint256 slashedAmount);
     event WinnerPicked(uint256 indexed id, string imageUrl, uint256 totalPool);
     event Payout(address indexed recipient, uint256 amount, string reason);
+    event Claimed(address indexed staker, uint256 amount);
+    event EmergencyRescue(address indexed caller, uint256 amount);
 
     // ══════════════════════════════════════════════════════════════
     //                        MODIFIERS
@@ -168,6 +187,73 @@ contract ClawdPFPMarket is ReentrancyGuard {
         emit Staked(id, msg.sender, sharesOut, STAKE_AMOUNT);
     }
 
+    /**
+     * @notice Claim your share of the winning pool (pull pattern).
+     *         Call after pickWinner() if you staked on the winning submission.
+     */
+    function claim() external nonReentrant {
+        require(winnerPicked, "No winner yet");
+        require(!hasClaimed[msg.sender], "Already claimed");
+
+        uint256 stakerShares = shares[winningId][msg.sender];
+        require(stakerShares > 0, "No shares on winner");
+
+        hasClaimed[msg.sender] = true;
+        claimedCount++;
+
+        uint256 payout;
+        if (claimedCount == totalWinningStakers) {
+            // Last claimer gets all remaining (handles dust)
+            payout = stakerPoolRemaining;
+        } else {
+            payout = (stakerPool * stakerShares) / totalWinningShares;
+        }
+
+        require(payout > 0, "Nothing to claim");
+        stakerPoolRemaining -= payout;
+
+        clawdToken.safeTransfer(msg.sender, payout);
+        emit Claimed(msg.sender, payout);
+    }
+
+    /**
+     * @notice Emergency rescue if admin never picks a winner.
+     *         Anyone can call after deadline + RESCUE_DELAY.
+     *         Returns all staked tokens proportionally.
+     */
+    function emergencyRescue() external afterDeadline nonReentrant {
+        require(!winnerPicked, "Winner already picked");
+        require(!rescueTriggered, "Already rescued");
+        require(block.timestamp > deadline + RESCUE_DELAY, "Too early for rescue");
+
+        rescueTriggered = true;
+
+        // Return all tokens to the contract — users will need to call emergencyWithdraw
+        emit EmergencyRescue(msg.sender, totalPool);
+    }
+
+    /**
+     * @notice Withdraw your stake after emergency rescue is triggered.
+     */
+    function emergencyWithdraw(uint256 id) external nonReentrant {
+        require(rescueTriggered, "No rescue triggered");
+
+        uint256 stakerShares = shares[id][msg.sender];
+        require(stakerShares > 0, "No shares");
+
+        // Zero out shares to prevent double withdrawal
+        shares[id][msg.sender] = 0;
+
+        Submission storage sub = submissions[id];
+        // Proportional return based on shares
+        uint256 payout = (sub.totalStaked * stakerShares) / sub.totalShares;
+        if (payout > 0) {
+            clawdToken.safeTransfer(msg.sender, payout);
+        }
+
+        emit Payout(msg.sender, payout, "rescue");
+    }
+
     // ══════════════════════════════════════════════════════════════
     //                     ADMIN FUNCTIONS
     // ══════════════════════════════════════════════════════════════
@@ -213,7 +299,7 @@ contract ClawdPFPMarket is ReentrancyGuard {
 
     /**
      * @notice Pick the winning submission after the deadline.
-     *         Distributes: 25% burn, 10% to OP, 65% to winning stakers.
+     *         Burns 25%, sends 10% to OP, stores 65% for staker claims.
      */
     function pickWinner(uint256 id) external onlyAdmin afterDeadline nonReentrant {
         require(!winnerPicked, "Winner already picked");
@@ -229,7 +315,13 @@ contract ClawdPFPMarket is ReentrancyGuard {
         // Calculate distributions
         uint256 burnAmount = (pool * BURN_BPS) / 10000;
         uint256 opBonus = (pool * OP_BONUS_BPS) / 10000;
-        uint256 stakerPool = pool - burnAmount - opBonus;
+        uint256 _stakerPool = pool - burnAmount - opBonus;
+
+        // Store for claim pattern
+        stakerPool = _stakerPool;
+        stakerPoolRemaining = _stakerPool;
+        totalWinningShares = winner.totalShares;
+        totalWinningStakers = stakers[id].length;
 
         // 1. Burn 25%
         clawdToken.safeTransfer(BURN_ADDRESS, burnAmount);
@@ -239,21 +331,7 @@ contract ClawdPFPMarket is ReentrancyGuard {
         clawdToken.safeTransfer(winner.submitter, opBonus);
         emit Payout(winner.submitter, opBonus, "op_bonus");
 
-        // 3. Distribute 65% to winning stakers proportional to shares
-        uint256 totalWinningShares = winner.totalShares;
-        address[] storage winStakers = stakers[id];
-
-        for (uint256 i = 0; i < winStakers.length; i++) {
-            address staker = winStakers[i];
-            uint256 stakerShares = shares[id][staker];
-            if (stakerShares > 0) {
-                uint256 payout = (stakerPool * stakerShares) / totalWinningShares;
-                if (payout > 0) {
-                    clawdToken.safeTransfer(staker, payout);
-                    emit Payout(staker, payout, "staker");
-                }
-            }
-        }
+        // 3. Staker pool held in contract — stakers call claim()
 
         emit WinnerPicked(id, winner.imageUrl, pool);
     }
@@ -264,12 +342,10 @@ contract ClawdPFPMarket is ReentrancyGuard {
 
     /**
      * @notice Get top whitelisted submissions sorted by totalStaked (descending).
-     *         Returns IDs and staked amounts for pagination.
      */
     function getTopSubmissions(uint256 offset, uint256 limit) 
         external view returns (uint256[] memory ids, uint256[] memory stakedAmounts) 
     {
-        // First, collect all whitelisted submissions
         uint256[] memory whitelistedIds = new uint256[](submissionCount);
         uint256[] memory whitelistedStakes = new uint256[](submissionCount);
         uint256 count = 0;
@@ -296,7 +372,6 @@ contract ClawdPFPMarket is ReentrancyGuard {
             whitelistedStakes[uint256(j + 1)] = keyStake;
         }
 
-        // Apply pagination
         uint256 start = offset;
         if (start >= count) {
             return (new uint256[](0), new uint256[](0));
@@ -381,17 +456,39 @@ contract ClawdPFPMarket is ReentrancyGuard {
         return deadline - block.timestamp;
     }
 
+    /**
+     * @notice Check if a staker can claim rewards.
+     */
+    function canClaim(address staker) external view returns (bool) {
+        if (!winnerPicked) return false;
+        if (hasClaimed[staker]) return false;
+        return shares[winningId][staker] > 0;
+    }
+
+    /**
+     * @notice Get estimated claim amount for a staker.
+     */
+    function getClaimAmount(address staker) external view returns (uint256) {
+        if (!winnerPicked) return 0;
+        if (hasClaimed[staker]) return 0;
+        uint256 stakerShares = shares[winningId][staker];
+        if (stakerShares == 0) return 0;
+        return (stakerPool * stakerShares) / totalWinningShares;
+    }
+
     // ══════════════════════════════════════════════════════════════
     //                    INTERNAL FUNCTIONS
     // ══════════════════════════════════════════════════════════════
 
     /**
      * @notice Calculate shares for STAKE_AMOUNT given current totalShares.
-     *         Bonding curve: price = BASE_PRICE + (totalShares * PRICE_INCREMENT)
-     *         shares = STAKE_AMOUNT / price
+     *         Bonding curve: price = BASE_PRICE + (normalizedShares * PRICE_INCREMENT)
+     *         Normalize totalShares to whole units before price calc to prevent
+     *         astronomical prices from 18-decimal share counts.
      */
     function _calculateShares(uint256 currentTotalShares) internal pure returns (uint256) {
-        uint256 currentPrice = BASE_PRICE + (currentTotalShares * PRICE_INCREMENT);
+        uint256 normalizedShares = currentTotalShares / 1e18;
+        uint256 currentPrice = BASE_PRICE + (normalizedShares * PRICE_INCREMENT);
         return (STAKE_AMOUNT * 1e18) / currentPrice;
     }
 }

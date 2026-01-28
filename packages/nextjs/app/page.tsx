@@ -555,6 +555,59 @@ function WinnerPickCard({ id, rank, onPick }: { id: number; rank: number; onPick
 }
 
 // ═══════════════════════════════════════════════════════════
+//                    CLAIM REWARDS
+// ═══════════════════════════════════════════════════════════
+
+function ClaimRewards() {
+  const { address } = useAccount();
+  const [isClaiming, setIsClaiming] = useState(false);
+  const { writeContractAsync: writeMarket } = useScaffoldWriteContract("ClawdPFPMarket");
+
+  const { data: canClaim } = useScaffoldReadContract({
+    contractName: "ClawdPFPMarket",
+    functionName: "canClaim",
+    args: [address],
+  });
+
+  const { data: claimAmount } = useScaffoldReadContract({
+    contractName: "ClawdPFPMarket",
+    functionName: "getClaimAmount",
+    args: [address],
+  });
+
+  const handleClaim = async () => {
+    setIsClaiming(true);
+    try {
+      await writeMarket({ functionName: "claim" });
+    } catch (e) {
+      console.error("Claim failed:", e);
+    } finally {
+      setIsClaiming(false);
+    }
+  };
+
+  if (!canClaim || !address) return null;
+
+  return (
+    <div className="card bg-gradient-to-r from-green-800 to-emerald-700 shadow-xl border-2 border-success">
+      <div className="card-body text-center">
+        <h3 className="card-title text-2xl justify-center">🎉 You Won!</h3>
+        <p className="text-lg">
+          You have <span className="font-bold">{claimAmount ? Number(formatEther(claimAmount)).toLocaleString() : "..."} $CLAWD</span> to claim
+        </p>
+        <button
+          className="btn btn-success btn-lg text-xl font-black mt-2"
+          onClick={handleClaim}
+          disabled={isClaiming}
+        >
+          {isClaiming ? <span className="loading loading-spinner loading-md"></span> : "💰 CLAIM REWARDS"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
 //                      MAIN PAGE
 // ═══════════════════════════════════════════════════════════
 
@@ -643,6 +696,9 @@ const Home: NextPage = () => {
       )}
 
       <div className="max-w-3xl w-full px-4 py-8 space-y-6">
+        {/* Claim Rewards */}
+        {winnerPicked && <ClaimRewards />}
+
         {/* Submit Form */}
         {!isTimedOut && !winnerPicked && <SubmitForm />}
 
