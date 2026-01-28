@@ -199,7 +199,10 @@ contract ClawdPFPMarket is ReentrancyGuard {
         require(stakerShares > 0, "No shares on winner");
 
         hasClaimed[msg.sender] = true;
-        claimedCount++;
+        
+        unchecked {
+            claimedCount++;
+        }
 
         uint256 payout;
         if (claimedCount == totalWinningStakers) {
@@ -210,7 +213,10 @@ contract ClawdPFPMarket is ReentrancyGuard {
         }
 
         require(payout > 0, "Nothing to claim");
-        stakerPoolRemaining -= payout;
+        
+        unchecked {
+            stakerPoolRemaining -= payout;
+        }
 
         clawdToken.safeTransfer(msg.sender, payout);
         emit Claimed(msg.sender, payout);
@@ -312,10 +318,16 @@ contract ClawdPFPMarket is ReentrancyGuard {
         Submission storage winner = submissions[id];
         uint256 pool = totalPool;
 
+        uint256 burnAmount;
+        uint256 opBonus;
+        uint256 _stakerPool;
+
         // Calculate distributions
-        uint256 burnAmount = (pool * BURN_BPS) / 10000;
-        uint256 opBonus = (pool * OP_BONUS_BPS) / 10000;
-        uint256 _stakerPool = pool - burnAmount - opBonus;
+        unchecked {
+            burnAmount = (pool * BURN_BPS) / 10000;
+            opBonus = (pool * OP_BONUS_BPS) / 10000;
+            _stakerPool = pool - burnAmount - opBonus;
+        }
 
         // Store for claim pattern
         stakerPool = _stakerPool;
