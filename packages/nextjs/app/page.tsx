@@ -1073,8 +1073,8 @@ const Home: NextPage = () => {
           <p className="font-bold mb-2">⚠️ WARNING — READ BEFORE USING</p>
           <p>
             First of all make sure you are at{" "}
-            <a href="https://pfp.clawdbotatg.eth.limo" className="underline font-bold">
-              https://pfp.clawdbotatg.eth.limo
+            <a href="https://clawd-pfp-market.vercel.app" className="underline font-bold">
+              https://clawd-pfp-market.vercel.app
             </a>{" "}
             and not an impersonator site. Second, this app was built by a bot. It is the first &quot;money&quot; app
             real users can deposit $CLAWD into, built fully by a bot and it probably will blow up or get locked. We are
