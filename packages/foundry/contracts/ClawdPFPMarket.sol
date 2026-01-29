@@ -39,7 +39,7 @@ contract ClawdPFPMarket is ReentrancyGuard {
     //                         CONSTANTS
     // ══════════════════════════════════════════════════════════════
 
-    uint256 public constant STAKE_AMOUNT = 1200e18;    // 1200 CLAWD per stake
+    uint256 public immutable STAKE_AMOUNT;               // CLAWD per stake (set in constructor)
     uint256 public constant BASE_PRICE = 1e18;           // Base price: 1 CLAWD per share
     uint256 public constant PRICE_INCREMENT = 1e15;      // Price goes up per share issued
     address public constant BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
@@ -114,10 +114,11 @@ contract ClawdPFPMarket is ReentrancyGuard {
     //                       CONSTRUCTOR
     // ══════════════════════════════════════════════════════════════
 
-    constructor(address _clawdToken, uint256 _duration, address _admin) {
+    constructor(address _clawdToken, uint256 _duration, address _admin, uint256 _stakeAmount) {
         clawdToken = IERC20(_clawdToken);
         deadline = block.timestamp + _duration;
         admin = _admin;
+        STAKE_AMOUNT = _stakeAmount;
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -486,7 +487,7 @@ contract ClawdPFPMarket is ReentrancyGuard {
      *         Normalize totalShares to whole units before price calc to prevent
      *         astronomical prices from 18-decimal share counts.
      */
-    function _calculateShares(uint256 currentTotalShares) internal pure returns (uint256) {
+    function _calculateShares(uint256 currentTotalShares) internal view returns (uint256) {
         uint256 normalizedShares = currentTotalShares / 1e18;
         uint256 currentPrice = BASE_PRICE + (normalizedShares * PRICE_INCREMENT);
         return (STAKE_AMOUNT * 1e18) / currentPrice;
