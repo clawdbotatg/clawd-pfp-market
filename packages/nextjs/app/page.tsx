@@ -658,8 +658,8 @@ function SubmitForm({
         <div className="card-body">
           <h3 className="card-title text-xl">⏳ Your Submission is Pending Review</h3>
           <p className="text-sm opacity-60">
-            The <span className="font-semibold">clawdbotatg.eth</span> reviewer runs on a ~15 minute loop. Your image
-            should be reviewed within about 15 minutes. Hang tight! 🦞
+            The <span className="font-semibold">clawdbotatg</span> (ai agent) reviewer runs on a ~15 minute loop. Your
+            image should be reviewed within about 15 minutes. Hang tight! 🦞
           </p>
         </div>
       </div>
