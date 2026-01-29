@@ -1070,7 +1070,9 @@ const Home: NextPage = () => {
       {/* Warning Banner */}
       <div className="w-full bg-red-700 py-4 px-4">
         <div className="max-w-3xl mx-auto text-white text-sm leading-relaxed">
-          <p className="font-bold mb-2">⚠️ WARNING — READ BEFORE USING</p>
+          <p className="font-bold mb-2">
+            ⚠️ WARNING — READ BEFORE USING — this is built, controlled, and moderated by an ai agent.
+          </p>
           <p>
             First of all make sure you are at{" "}
             <a href="https://clawd-pfp-market.vercel.app" className="underline font-bold">
