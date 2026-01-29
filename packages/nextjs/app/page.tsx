@@ -412,8 +412,11 @@ function SubmissionCard({
       setTimeout(() => {
         onRefetch();
       }, 2000);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Stake failed:", e);
+      if (e?.message?.includes("0xe450d38c") || e?.message?.includes("InsufficientBalance")) {
+        alert("You don't have enough $CLAWD tokens! You need 50,000 $CLAWD to stake. Buy some on Base first.");
+      }
     } finally {
       setIsStaking(false);
     }
@@ -634,8 +637,11 @@ function SubmitForm({
       });
       setImageUrl("");
       setTimeout(onRefetch, 2000);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Submit failed:", e);
+      if (e?.message?.includes("0xe450d38c") || e?.message?.includes("InsufficientBalance")) {
+        alert("You don't have enough $CLAWD tokens! You need 50,000 $CLAWD to submit. Buy some on Base first.");
+      }
     } finally {
       setIsSubmitting(false);
     }
